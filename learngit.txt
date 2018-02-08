@@ -1,0 +1,235 @@
+﻿安装git
+$ git config --global user.name "Your Name"
+$ git config --global user.email "email@example.com"
+以上进行了全局配置，当然有些时候我们的某一个项目想要用特定的邮箱，这个时候只需切换到你的项目目录，以上代码把 --global 参数去除，再重新执行一遍就ok了。
+
+创建版本库
+$ mkdir learngit
+$ cd learngit
+$ pwd
+
+新建文件
+touch a.md （新建a.md文件）
+
+把这个目录变成Git可以管理的仓库
+$ git init
+Initialized empty Git repository in /Users/michael/learngit/.git/
+
+Untracked files ，就是说 a.md 这个文件还没有被跟踪，还没有提交在 git 仓库里呢，而且提示你可以使用 git add 去操作你想要提交的文件。
+
+第一步，用命令git add告诉Git，把文件添加到仓库
+$ git add readme.txt
+第二步，用命令git commit告诉Git，把文件提交到仓库：
+$ git commit -m "wrote a readme file"
+commit可以一次提交很多文件，所以你可以多次add不同的文件
+$ git add file1.txt
+$ git add file2.txt file3.txt
+$ git commit -m "add 3 files."
+
+git status命令可以让我们时刻掌握仓库当前的状态
+$ git status
+
+git diff顾名思义就是查看difference
+$ git diff readme.txt 
+
+提交修改和提交新文件是一样的两步，
+$ git add readme.txt
+$ git commit -m "xiugai"
+
+版本控制系统肯定有某个命令可以告诉我们历史记录，在Git中，我们用git log命令查看
+$ git log
+
+输出信息太多，可以加
+$ git log --pretty=oneline
+
+在Git中，用HEAD表示当前版本，也就是最新版本，上个版本是HEAD^，上100个版本HEAD~100
+$ git reset --hard HEAD^
+
+到达指定版本号，不管以前未来，只要当前窗口没有变（找版本号前几位）
+$ git reset --hard 3628164
+
+查看文件
+$ cat readme.txt
+
+git reflog用来记录你的每一次命令：
+$ git reflog
+
+查看工作区和版本库里面最新版本的区别
+git diff HEAD -- readme.txt
+
+丢弃工作区的修改
+$ git checkout -- readme.txt
+命令git checkout -- readme.txt意思就是，把readme.txt文件在工作区的修改全部撤销，这里有两种情况：
+一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+总之，就是让这个文件回到最近一次git commit或git add时的状态。
+
+暂存区的修改撤销掉（unstage），重新放回工作区
+$ git reset HEAD readme.txt
+
+git reset命令既可以回退版本，也可以把暂存区的修改回退到工作区。当我们用HEAD时，表示最新的版本。
+
+小结时间:
+场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout -- file
+场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD file，就回到了场景1，第二步按场景1操作
+场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库
+
+git中删除文件
+$ git rm test.txt
+然后提交
+或者删除了，忽略工作区的删除
+$ git checkout -- test.txt
+
+git checkout其实是用版本库里的版本替换工作区的版本，无论工作区是修改还是删除，都可以“一键还原
+
+创建SSH（邮箱改成自己的，一路默认即可，自己使用不需要密码）
+$ ssh-keygen -t rsa -C "youremail@example.com"
+当然，GitHub允许你添加多个Key。假定你有若干电脑，你一会儿在公司提交，一会儿在家里提交，只要把每台电脑的Key都添加到GitHub，就可以在每台电脑上往GitHub推送了。
+
+查看ssh添加成功
+$ ssh -T git@github.com
+
+
+在GitHub中添加新仓库
+将本地的仓库与github的仓库与之关联
+$ git remote add origin git@github.com:zmengyuan/learngit.git
+添加后，远程库的名字就是origin
+
+查看连接的远程仓库
+$git remote -v
+
+将本地仓库内容推送到远程仓库
+$ git push -u origin master
+由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令
+只要本地做了修改，就可以通过命令提交
+$ git push origin master
+
+在每次更新前可以pull
+$ git pull origin master
+
+将远程仓库克隆到本地
+$ git clone git@github.com:zmengyuan/gitskills.git
+
+HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。
+
+创建分支
+$ git checkout -b dev
+git checkout命令加上-b参数表示创建并切换，相当于以下两条命令：
+$ git branch dev
+$ git checkout dev
+
+查看当前分支
+$ git branch
+
+我们把dev分支的工作成果合并到master分支上，合并指定分支到当前分支
+$ git merge dev
+Fast-forward信息，Git告诉我们，这次合并是“快进模式”，也就是直接把master指向dev的当前提交，所以合并速度非常快。
+
+删除分支
+$ git branch -d dev
+
+小结
+Git鼓励大量使用分支：
+查看分支：git branch
+创建分支：git branch <name>
+切换分支：git checkout <name>
+创建+切换分支：git checkout -b <name>
+合并某分支到当前分支：git merge <name>
+删除分支：git branch -d <name>
+
+
+冲突情况下也只有合并，然后在合并的文件中修改。
+
+查看分支合并情况
+$ git log --graph --pretty=oneline --abbrev-commit
+git log --graph命令可以看到分支合并图。
+
+禁用Fast forward合并
+$ git merge --no-ff -m "merge with no-ff" dev
+
+当前工作现场“储藏”起来
+$ git stash
+
+查看工作现场
+$ git stash list
+
+恢复工作现场
+一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+另一种方式是用git stash pop，恢复的同时把stash内容也删了：
+
+你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+$ git stash apply stash@{0}
+
+查看远程库的信息
+$ git remote
+$ git remote -v
+
+推送分支
+$ git push origin master
+
+连接远程的其他分支
+$ git checkout -b dev origin/dev
+
+更新
+$ git pull
+
+指定本地dev分支与远程origin/dev分支的链接
+$ git branch --set-upstream-to origin/dev dev 
+
+因此，多人协作的工作模式通常是这样：
+首先，可以试图用git push origin branch-name推送自己的修改；
+如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；
+如果合并有冲突，则解决冲突，并在本地提交；
+没有冲突或者解决掉冲突后，再用git push origin branch-name推送就能成功！
+如果git pull提示“no tracking information”，则说明本地分支和远程分支的链接关系没有创建，用命令git branch --set-upstream branch-name origin/branch-name。
+
+查看远程库信息，使用git remote -v；
+本地新建的分支如果不推送到远程，对其他人就是不可见的；
+从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交；
+在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致；
+建立本地分支和远程分支的关联，使用git branch --set-upstream branch-name origin/branch-name；
+从远程抓取分支，使用git pull，如果有冲突，要先处理冲突。
+
+新建标签
+$ git tag <name>
+
+指定版本的标签
+$ git tag v0.9 6224937
+
+查看标签
+$ git tag
+
+查看标签信息
+git show <tagname>
+$ git show v0.9
+
+创建带有说明的标签，用-a指定标签名，-m指定说明文字：
+$ git tag -a v0.1 -m "version 0.1 released" 3628164
+
+通过-s用私钥签名一个标签：
+$ git tag -s v0.2 -m "signed version 0.2 released" fec145a
+签名采用PGP签名，因此，必须首先安装gpg（GnuPG），如果没有找到gpg，或者没有gpg密钥对，就会报错
+
+删除标签
+$ git tag -d v0.1
+
+推送标签到远程
+$ git push origin v1.0
+
+一次性推送全部尚未推送到远程的本地标签
+$ git push origin --tags
+
+先删除本地标签
+$ git tag -d v0.9
+再删除远程
+$ git push origin :refs/tags/v0.9
+
+让git显示颜色
+$ git config --global color.ui true
+
+忽略文件
+
+配置别名
+
+
+
