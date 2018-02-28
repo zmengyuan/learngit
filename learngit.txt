@@ -128,6 +128,9 @@ Fast-forward信息，Git告诉我们，这次合并是“快进模式”，也�
 删除分支
 $ git branch -d dev
 
+强制删除分支（比如还没有合并的情况下）
+$ git branch -D
+
 小结
 Git鼓励大量使用分支：
 查看分支：git branch
@@ -198,6 +201,9 @@ $ git tag v0.9 6224937
 
 查看标签
 $ git tag
+
+切换到某个标签
+$ git checkout v1.0
 
 查看标签信息
 git show <tagname>
