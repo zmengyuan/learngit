@@ -29,9 +29,6 @@ $ git commit -m "add 3 files."
 git status命令可以让我们时刻掌握仓库当前的状态
 $ git status
 
-git diff顾名思义就是查看difference
-$ git diff readme.txt 
-
 提交修改和提交新文件是一样的两步，
 $ git add readme.txt
 $ git commit -m "xiugai"
@@ -41,6 +38,167 @@ $ git log
 
 输出信息太多，可以加
 $ git log --pretty=oneline
+
+创建SSH（邮箱改成自己的，一路默认即可，自己使用不需要密码）
+$ ssh-keygen -t rsa -C "youremail@example.com"
+当然，GitHub允许你添加多个Key。假定你有若干电脑，你一会儿在公司提交，一会儿在家里提交，只要把每台电脑的Key都添加到GitHub，就可以在每台电脑上往GitHub推送了。
+
+查看ssh添加成功
+$ ssh -T git@github.com
+
+
+
+在GitHub中添加新仓库
+将本地的仓库与github的仓库与之关联,origin是我们给远程仓库起的名字
+$ git remote add origin git@github.com:zmengyuan/learngit.git
+添加后，远程库的名字就是origin
+
+查看连接的远程仓库
+$git remote -v
+
+将本地仓库内容推送到远程仓库（后面的master是本地的master，是指将本地的master分支推送到远程对应的master分支）
+$ git push -u origin master
+由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令
+只要本地做了修改，就可以通过命令提交
+$ git push origin mastergit 
+push origin develop:develop2 推送本地develop分支到远程develop2分支，但是不建议这样做！！！
+
+在每次更新前可以pull
+$ git pull origin master
+
+将远程仓库克隆到本地
+$ git clone git@github.com:zmengyuan/gitskills.git
+可以把 clone 命令理解为高级点的复制，这个时候该项目本身就已经是一个git 仓库了，不需要执行 git init 进行初始化，而且甚至都已经关联好了远程仓库，我们只需要在这个 test 目录下任意修改或者添加文件，然后进行 commit ，之后就可以执行：
+克隆到本地的项目默认只能看到本地master分支
+
+
+创建本地的其他分支
+$ git checkout -b dev origin/dev
+
+指定本地dev分支与远程origin/dev分支的链接
+$ git branch --set-upstream-to origin/dev dev 
+
+因此，多人协作的工作模式通常是这样：
+首先，可以试图用git push origin branch-name推送自己的修改；
+如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；
+如果合并有冲突，则解决冲突，并在本地提交；
+没有冲突或者解决掉冲突后，再用git push origin branch-name推送就能成功！
+如果git pull提示“no tracking information”，则说明本地分支和远程分支的链接关系没有创建，用命令git branch --set-upstream branch-name origin/branch-name。
+
+查看远程库信息，使用git remote -v；
+本地新建的分支如果不推送到远程，对其他人就是不可见的；
+从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交；
+在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致；
+建立本地分支和远程分支的关联，使用git branch --set-upstream branch-name origin/branch-name；
+从远程抓取分支，使用git pull，如果有冲突，要先处理冲突。
+
+
+
+配置别名
+$ git config --global alias.st status
+比较屌的别名
+$ git config --global alias.lg "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+
+
+修改git的编辑器(苹果默认是vi)
+$ git config --global core.editor "vim"  # 设置Editor使用vim
+
+开启给git着色
+$ git config --global color.ui true
+$ git config --global core.quotepath false # 设置显示中文文件名
+
+查看git的配置
+$ git config -l
+
+git diff顾名思义就是查看difference,比较的是当前文件和暂存区文件
+$ git diff readme.txt 
+
+$ git diff <$id1> <$id2>   # 比较两次提交之间的差异
+$ git diff <branch1>..<branch2> # 在两个分支之间比较 
+$ git diff --staged   # 比较暂存区和版本库差异
+
+checkout 切换分支、标签、某次commit
+$ git checkout develop
+$ git checkout v1.0
+$ git checkout ffd9f2dd68f1eb21d36cee50dbdd504e95d9c8f7 # 后面的一长串是commit_id，是每次commit的SHA1值，可以根据 git log 看到。
+除了切换，checkout还有撤销的作用（只能撤销还没有 add 进暂存区的文件）
+$ git checkout a.md
+
+
+把当前工作现场“储藏”起来
+$ git stash
+
+查看工作现场
+$ git stash list
+
+恢复工作现场
+一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除，drop 是只删除一条，当然后面可以跟 stash_id 参数来删除指定的某条记录，不跟参数就是删除最近的；
+另一种方式是用git stash pop，恢复的同时把stash内容也删了：
+
+你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+$ git stash apply stash@{0}
+
+清空所有暂存区的记录
+$ git stash clear
+
+创建分支
+$ git checkout -b dev
+git checkout命令加上-b参数表示创建并切换，相当于以下两条命令：
+$ git branch dev
+$ git checkout dev
+
+查看当前分支
+$ git branch
+
+查看远程分支
+$ git branch -r
+
+我们把dev分支的工作成果合并到master分支上，合并指定分支到当前分支
+$ git merge dev
+Fast-forward信息，Git告诉我们，这次合并是“快进模式”，也就是直接把master指向dev的当前提交，所以合并速度非常快。
+
+删除分支
+$ git branch -d dev
+
+如果要丢弃一个没有被合并过的分支,强制删除分支（比如还没有合并的情况下）
+$ git branch -D
+
+删除远程分支
+$ git push origin :develop
+
+如果远程分支有个 develop ，而本地没有，你想把远程的 develop 分支迁到本地：
+$ git checkout develop origin/develop
+
+同样的把远程分支迁到本地顺便切换到该分支：
+$ git checkout -b develop origin/develop
+
+小结
+Git鼓励大量使用分支：
+查看分支：git branch
+创建分支：git branch <name>
+切换分支：git checkout <name>
+创建+切换分支：git checkout -b <name>
+合并某分支到当前分支：git merge <name>
+删除分支：git branch -d <name>
+
+
+冲突情况下也只有合并，然后在合并的文件中修改。
+
+查看分支合并情况
+$ git log --graph --pretty=oneline --abbrev-commit
+git log --graph命令可以看到分支合并图。
+
+禁用Fast forward合并
+$ git merge --no-ff -m "merge with no-ff" dev
+
+
+
+
+
+
+
+
+
 
 在Git中，用HEAD表示当前版本，也就是最新版本，上个版本是HEAD^，上100个版本HEAD~100
 $ git reset --hard HEAD^
@@ -82,116 +240,13 @@ $ git checkout -- test.txt
 
 git checkout其实是用版本库里的版本替换工作区的版本，无论工作区是修改还是删除，都可以“一键还原
 
-创建SSH（邮箱改成自己的，一路默认即可，自己使用不需要密码）
-$ ssh-keygen -t rsa -C "youremail@example.com"
-当然，GitHub允许你添加多个Key。假定你有若干电脑，你一会儿在公司提交，一会儿在家里提交，只要把每台电脑的Key都添加到GitHub，就可以在每台电脑上往GitHub推送了。
-
-查看ssh添加成功
-$ ssh -T git@github.com
-
-
-在GitHub中添加新仓库
-将本地的仓库与github的仓库与之关联
-$ git remote add origin git@github.com:zmengyuan/learngit.git
-添加后，远程库的名字就是origin
-
-查看连接的远程仓库
-$git remote -v
-
-将本地仓库内容推送到远程仓库
-$ git push -u origin master
-由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令
-只要本地做了修改，就可以通过命令提交
-$ git push origin master
-
-在每次更新前可以pull
-$ git pull origin master
-
-将远程仓库克隆到本地
-$ git clone git@github.com:zmengyuan/gitskills.git
-
 HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。
 
-创建分支
-$ git checkout -b dev
-git checkout命令加上-b参数表示创建并切换，相当于以下两条命令：
-$ git branch dev
-$ git checkout dev
-
-查看当前分支
-$ git branch
-
-我们把dev分支的工作成果合并到master分支上，合并指定分支到当前分支
-$ git merge dev
-Fast-forward信息，Git告诉我们，这次合并是“快进模式”，也就是直接把master指向dev的当前提交，所以合并速度非常快。
-
-删除分支
-$ git branch -d dev
-
-强制删除分支（比如还没有合并的情况下）
-$ git branch -D
-
-小结
-Git鼓励大量使用分支：
-查看分支：git branch
-创建分支：git branch <name>
-切换分支：git checkout <name>
-创建+切换分支：git checkout -b <name>
-合并某分支到当前分支：git merge <name>
-删除分支：git branch -d <name>
 
 
-冲突情况下也只有合并，然后在合并的文件中修改。
 
-查看分支合并情况
-$ git log --graph --pretty=oneline --abbrev-commit
-git log --graph命令可以看到分支合并图。
 
-禁用Fast forward合并
-$ git merge --no-ff -m "merge with no-ff" dev
 
-当前工作现场“储藏”起来
-$ git stash
-
-查看工作现场
-$ git stash list
-
-恢复工作现场
-一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
-另一种方式是用git stash pop，恢复的同时把stash内容也删了：
-
-你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
-$ git stash apply stash@{0}
-
-查看远程库的信息
-$ git remote
-$ git remote -v
-
-推送分支
-$ git push origin master
-
-连接远程的其他分支
-$ git checkout -b dev origin/dev
-
-更新
-$ git pull
-
-指定本地dev分支与远程origin/dev分支的链接
-$ git branch --set-upstream-to origin/dev dev 
-
-因此，多人协作的工作模式通常是这样：
-首先，可以试图用git push origin branch-name推送自己的修改；
-如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；
-如果合并有冲突，则解决冲突，并在本地提交；
-没有冲突或者解决掉冲突后，再用git push origin branch-name推送就能成功！
-如果git pull提示“no tracking information”，则说明本地分支和远程分支的链接关系没有创建，用命令git branch --set-upstream branch-name origin/branch-name。
-
-查看远程库信息，使用git remote -v；
-本地新建的分支如果不推送到远程，对其他人就是不可见的；
-从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交；
-在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致；
-建立本地分支和远程分支的关联，使用git branch --set-upstream branch-name origin/branch-name；
-从远程抓取分支，使用git pull，如果有冲突，要先处理冲突。
 
 新建标签
 $ git tag <name>
@@ -235,7 +290,6 @@ $ git config --global color.ui true
 
 忽略文件
 
-配置别名
 
 
 
